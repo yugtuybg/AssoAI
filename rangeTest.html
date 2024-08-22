@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI导航站</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 30px; /* 增大logo尺寸 */
+            margin-right: 5px;
+        }
+
+        .logo span {
+            font-size: 1.2rem; /* 增大“Navi-AI”字体大小 */
+            color: white;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: white;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #ff6600;
+        }
+
+        .get-started {
+            background: linear-gradient(145deg, #0066cc, #004080);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .get-started:hover {
+            background: linear-gradient(145deg, #007fff, #0059b3);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 70px;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container input[type="text"] {
+            padding: 8px;
+            border: 2px solid #6a11cb;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            width: 250px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-container button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #6a11cb;
+            color: white;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .search-container button:hover {
+            background-color: #2575fc;
+        }
+
+        .category-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 1200px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .category-titles {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 10px;
+            width: 200px;
+            background-color: #6a11cb;
+            padding: 20px;
+        }
+
+        .category-title {
+            color: white;
+            font-size: 1.5rem;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .category-title:hover {
+            background-color: #2575fc;
+        }
+
+        .nav-container {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            background-color: white;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .nav-container.active {
+            display: grid;
+        }
+
+        .nav-container a {
+            text-decoration: none;
+            padding: 20px;
+            border-radius: 15px;
+            background-color: white;
+            color: #333;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            height: 100px;
+        }
+
+        .nav-container a img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .nav-container a:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+            background-color: #f9f9f9;
+            box-shadow: 0 0 0 3px #6a11cb;
+        }
+
+        footer {
+            background-color: #f0f2f5;
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: auto;
+            color: #2c3e50;
+        }
+
+        .footer-nav a {
+            color: #2c3e50;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        .footer-nav a:hover {
+            color: #3498db;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .category-title {
+                font-size: 1.25rem;
+            }
+
+            .nav-container {
+                gap: 15px;
+            }
+
+            .nav-container a {
+                font-size: 0.95rem;
+                padding: 15px;
+            }
+
+            .search-container input[type="text"] {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .category-title {
+                font-size: 1.1rem;
+            }
+
+            .nav-container a {
+                padding: 12px;
+            }
+
+            .search-container input[type="text"] {
+                width: 150px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+            }
+
+            .footer-nav {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+            <span>Navi-AI</span>
+        </div>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#products">Products</a>
+            <a href="#contact">Contact</a>
+            <a href="#faq">FAQ</a>
+        </nav>
+        <a href="#" class="get-started">Get Started</a>
+    </header>
+
+    <div class="header">
+        <h1>AI导航站</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search Your Tool...">
+            <button onclick="search()">搜索</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-titles">
+            <h2 class="category-title" onclick="showCategory('search')">AI搜索</h2>
+            <h2 class="category-title" onclick="showCategory('companion')">AI陪伴</h2>
+            <h2 class="category-title" onclick="showCategory('writing')">AI写作</h2>
+            <h2 class="category-title" onclick="showCategory('music')">AI音乐</h2>
+            <h2 class="category-title" onclick="showCategory('video')">AI视频</h2>
+            <h2 class="category-title" onclick="showCategory('coding')">AI编程</h2>
+            <h2 class="category-title" onclick="showCategory('law')">AI法律</h2>
+            <h2 class="category-title" onclick="showCategory('design')">AI设计</h2>
+            <h2 class="category-title" onclick="showCategory('PPT')">AI PPT</h2>
+        </div>
+
+        <div class="nav-container" id="search">
+            <a href="https://kimi.moonshot.cn/" target="_blank" id="Kimi智能助手">
+                <img src="kimi-logo.png" alt="Kimi智能助手 Logo">
+                <span>Kimi智能助手</span>
+            </a>
+            <a href="https://metaso.cn/" target="_blank" id="秘塔AI">
+                <img src="秘塔AI.png" alt="秘塔AI Logo">
+                <span>秘塔AI</span>
+            </a>
+            <a href="https://www.doubao.com/" target="_blank" id="豆包">
+                <img src="豆包.png" alt="豆包 Logo">
+                <span>豆包</span>
+            </a>
+            <a href="https://tongyi.aliyun.com/qianwen/" target="_blank" id="通义千问">
+                <img src="通义.png" alt="通义 Logo">
+                <span>通义千问</span>
+            </a>
+            <a href="https://ying.baichuan-ai.com/chat/" target="_blank" id="百小应">
+                <img src="百小应.png" alt="百小应 Logo">
+                <span>百小应</span>
+            </a>
+            <a href="https://www.tiangong.cn/" target="_blank" id="天工">
+                <img src="天工.png" alt="天工 Logo">
+                <span>天工</span>
+            </a>
+            <a href="https://chatglm.cn/" target="_blank" id="智谱清言">
+                <img src="智谱清言.png" alt="智谱清言 Logo">
+                <span>智谱清言</span>
+            </a>
+            <a href="https://yiyan.baidu.com/" target="_blank" id="文心一言">
+                <img src="文心一言.png" alt="文心一言 Logo">
+                <span>文心一言</span>
+            </a>
+            <a href="https://so.360.com/" target="_blank" id="360AI搜索">
+                <img src="360AI搜索.png" alt="360AI搜索 Logo">
+                <span>360AI搜索</span>
+            </a>
+            <a href="https://yuewen.cn/chats/" target="_blank" id="跃问">
+                <img src="跃问.png" alt="跃问 Logo">
+                <span>跃问</span>
+            </a>
+            <a href="https://yuanbao.tencent.com/" target="_blank" id="腾讯元宝">
+                <img src="腾讯元宝.png" alt="腾讯元宝 Logo">
+                <span>腾讯元宝</span>
+            </a>
+            <a href="https://www.wenxiaobai.com/" target="_blank" id="问小白">
+                <img src="问小白.png" alt="问小白 Logo">
+                <span>问小白</span>
+            </a>
+            <a href="https://zhida.zhihu.com/" target="_blank" id="知乎直答">
+                <img src="知乎直答.png" alt="知乎直答 Logo">
+                <span>知乎直答</span>
+            </a>
+            <a href="https://iflow.cn/" target="_blank" id="心流">
+                <img src="心流.png" alt="心流 Logo">
+                <span>心流</span>
+            </a>
+            <a href="https://xinghuo.xfyun.cn/" target="_blank" id="讯飞星火">
+                <img src="讯飞星火.png" alt="讯飞星火 Logo">
+                <span>讯飞星火</span>
+            </a>
+            <a href="https://https://hailuoai.com/" target="_blank" id="海螺AI">
+                <img src="海螺AI.png" alt="海螺AI Logo">
+                <span>海螺AI</span>
+            </a>
+        </div>
+
+        <div class="nav-container" id="companion">
+            <a href="https://edit.myparallelstory.com/" target="_blank" id="猫箱">
+                <img src="猫箱.png" alt="猫箱 Logo">
+                <span>猫箱</span>
+            </a>
+            <a href="https://www.xingyeai.com/" target="_blank" id="星野">
+                <img src="星野.png" alt="星野 Logo">
+                <span>星野</span>
+            </a>
+            <a href="https://www.zhumengdao.com/" target="_blank" id="筑梦岛">
+                <img src="筑梦岛.png" alt="筑梦岛 Logo">
+                <span>筑梦岛</span>
+            </a>
+            <a href="https://aichat.baidu.com/" target="_blank" id="小侃星球">
+                <img src="小侃星球.png" alt="小侃星球 Logo">
+                <span>小侃星球</span>
+            </a>
+            <a href="https://maopaoya.com/" target="_blank" id="冒泡鸭">
+                <img src="冒泡鸭.png" alt="冒泡鸭 Logo">
+                <span>冒泡鸭</span>
+            </a>
+            <a href="https://www.wantalk.com/" target="_blank" id="万话">
+                <img src="万话.png" alt="万话 Logo">
+                <span>万话</span>
+            </a>
+            <a href="https://xuanheai.com/" target="_blank" id="悬河">
+                <img src="悬河.png" alt="悬河 Logo">
+                <span>悬河</span>
+            </a>
+            <a href="https://ciyuan.ideaflow.pro/" target="_blank" id="造梦次元">
+                <img src="造梦次元.png" alt="造梦次元 Logo">
+                <span>造梦次元</span>
+            </a>
+            <a href="https://nieta.art/" target="_blank" id="捏Ta">
+                <img src="捏Ta.png" alt="捏Ta Logo">
+                <span>捏Ta</span>
+            </a>
+            <a href="https://www.xiaomengai.com/" target="_blank" id="彩云小梦">
+                <img src="彩云小梦.png" alt="彩云小梦 Logo">
+                <span>彩云小梦</span>
+            </a>
+            <a href="https://www.truth-ai.cn/" target="_blank" id="我在AI">
+                <img src="我在AI.png" alt="我在AI Logo">
+                <span>我在AI</span>
+            </a>
+            <a href="https://weiban.qq.com/" target="_blank" id="未伴">
+                <img src="未伴.png" alt="未伴 Logo">
+                <span>未伴</span>
+            </a>
+        </div>
+
+        <div class="nav-container" id="writing">
+            <a href="https://cp.baidu.com/" target="_blank" id="橙篇">
+                <img src="橙篇.png" alt="橙篇 Logo">
+                <span>橙篇</span>
+            </a>
+            <a href="https://wawawriter.com/" target="_blank" id="蛙蛙写作">
+                <img src="蛙蛙写作.png" alt="蛙蛙写作 Logo">
+                <span>蛙蛙写作</span>
+            </a>
+            <a href="https://www.shenyandayi.com/" target="_blank" id="深言达意">
+                <img src="深言达意.png" alt="深言达意 Logo">
+                <span>深言达意</span>
+            </a>
+            <a href="https://miaobi.xinhuaskl.com/" target="_blank" id="新华妙笔">
+                <img src="新华妙笔.png" alt="新华妙笔 Logo">
+                <span>新华妙笔</span>
+            </a>
+            <a href="https://www.guangsuxie.com/" target="_blank" id="光速写作">
+                <img src="光速写作.png" alt="光速写作 Logo">
+                <span>光速写作</span>
+            </a>
+            <a href="https://xiezuocat.com/" target="_blank" id="秘塔写作猫">
+                <img src="秘塔写作猫.png" alt="秘塔写作猫 Logo">
+                <span>秘塔写作猫</span>
+            </a>
+            <a href="https://littlefrog.ai/" target="_blank" id="写作蛙">
+                <img src="写作蛙.png" alt="写作蛙 Logo">
+                <span>写作蛙</span>
+            </a>
+            <a href="https://huixie.iflyrec.com/" target="_blank" id="讯飞写作">
+                <img src="讯飞写作.png" alt="讯飞写作 Logo">
+                <span>讯飞写作</span>
+            </a>
+            <a href="https://wen.mobvoi.com/" target="_blank" id="奇妙文">
+                <img src="奇妙文.png" alt="奇妙文 Logo">
+                <span>奇妙文</span>
+            </a>
+            <a href="https://verse.app.yinxiang.com/" target="_blank" id="Verse">
+                <img src="Verse.png" alt="Verse Logo">
+                <span>Verse</span>
+            </a>
+            <a href="https://writingo.net/" target="_blank" id="火山写作">
+                <img src="火山写作.png" alt="火山写作 Logo">
+                <span>火山写作</span>
+            </a>
+            <a href="https://www.ximalaya.com/gatekeeper/write-wise-web" target="_blank" id="WriteWise">
+                <img src="WriteWise.png" alt="WriteWise Logo">
+                <span>WriteWise</span>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 Navi-AI. All rights reserved.</p>
+            <nav class="footer-nav">
+                <a href="#privacy">Privacy Policy</a>
+                <a href="#terms">Terms of Service</a>
+                <a href="#contact">Contact Us</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script>
+        function search() {
+            const query = document.getElementById('searchInput').value.trim();
+            const element = document.getElementById(query);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                element.style.boxShadow = '0 0 0 3px #2575fc';
+
+                // 自动跳转
+                const link = element.querySelector('a');
+                if (link) {
+                    window.location.href = link.href;
+                }
+            } else {
+                alert(`没有找到: ${query}`);
+            }
+        }
+        
+        // Enter键监听
+        document.getElementById('searchInput').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                search();
+            }
+        });
+
+        function showCategory(category) {
+            const containers = document.querySelectorAll('.nav-container');
+            containers.forEach(container => container.classList.remove('active'));
+            document.getElementById(category).classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 默认显示第一个分类
+            document.querySelector('.category-title').click();
+        });
+    </script>
+</body>
+</html>
